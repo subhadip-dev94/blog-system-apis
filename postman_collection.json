@@ -1,0 +1,27 @@
+{
+  "info": { "name": "Blog API", "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json" },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "token", "value": "" },
+    { "key": "categoryId", "value": "" },
+    { "key": "postId", "value": "" }
+  ],
+  "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+  "item": [
+    { "name": "Signup", "request": { "auth": { "type": "noauth" }, "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/api/auth/signup", "body": { "mode": "raw", "raw": "{\"name\":\"Test User\",\"email\":\"test@example.com\",\"password\":\"secret123\"}" } } },
+    { "name": "Verify email (paste token from email/console)", "request": { "auth": { "type": "noauth" }, "method": "GET", "url": "{{baseUrl}}/api/auth/verify-email/PASTE_TOKEN" } },
+    { "name": "Resend verification", "request": { "auth": { "type": "noauth" }, "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/api/auth/resend-verification", "body": { "mode": "raw", "raw": "{\"email\":\"test@example.com\"}" } } },
+    { "name": "Login (saves token)", "event": [{ "listen": "test", "script": { "exec": ["const j = pm.response.json(); if (j.token) pm.collectionVariables.set('token', j.token);"] } }], "request": { "auth": { "type": "noauth" }, "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/api/auth/login", "body": { "mode": "raw", "raw": "{\"email\":\"test@example.com\",\"password\":\"secret123\"}" } } },
+    { "name": "Get my profile", "request": { "method": "GET", "url": "{{baseUrl}}/api/users/me" } },
+    { "name": "Update my profile (multipart)", "request": { "method": "PUT", "url": "{{baseUrl}}/api/users/me", "body": { "mode": "formdata", "formdata": [{ "key": "name", "value": "Test User", "type": "text" }, { "key": "bio", "value": "Hello there", "type": "text" }, { "key": "profilePicture", "type": "file" }] } } },
+    { "name": "Create category (saves id)", "event": [{ "listen": "test", "script": { "exec": ["const j = pm.response.json(); if (j.category) pm.collectionVariables.set('categoryId', j.category._id);"] } }], "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/api/categories", "body": { "mode": "raw", "raw": "{\"name\":\"Technology\",\"description\":\"Tech articles\"}" } } },
+    { "name": "List categories with posts", "request": { "auth": { "type": "noauth" }, "method": "GET", "url": "{{baseUrl}}/api/categories" } },
+    { "name": "Create post (saves id)", "event": [{ "listen": "test", "script": { "exec": ["const j = pm.response.json(); if (j.post) pm.collectionVariables.set('postId', j.post._id);"] } }], "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/api/posts", "body": { "mode": "raw", "raw": "{\"title\":\"My first post\",\"content\":\"Hello world\",\"category\":\"{{categoryId}}\",\"tags\":[\"node\",\"mongo\"]}" } } },
+    { "name": "Edit post", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/api/posts/{{postId}}", "body": { "mode": "raw", "raw": "{\"title\":\"Updated title\",\"content\":\"Updated content\",\"tags\":[\"updated\"]}" } } },
+    { "name": "Like / unlike post", "request": { "method": "POST", "url": "{{baseUrl}}/api/posts/{{postId}}/like" } },
+    { "name": "Add comment", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/api/posts/{{postId}}/comments", "body": { "mode": "raw", "raw": "{\"text\":\"Nice post!\"}" } } },
+    { "name": "Posts sorted by likes", "request": { "auth": { "type": "noauth" }, "method": "GET", "url": "{{baseUrl}}/api/posts?page=1&limit=10" } },
+    { "name": "Get one post", "request": { "auth": { "type": "noauth" }, "method": "GET", "url": "{{baseUrl}}/api/posts/{{postId}}" } },
+    { "name": "Delete post", "request": { "method": "DELETE", "url": "{{baseUrl}}/api/posts/{{postId}}" } }
+  ]
+}
